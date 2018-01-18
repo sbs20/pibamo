@@ -94,6 +94,12 @@ install_all()
     check_privilege
     install_dependencies
     configure_nginx
+
+    echo
+    echo "${PROG} installed. Try:"
+    echo "    ${PROG} start"
+    echo "    ${PROG} stop"
+    echo
 }
 
 uninstall()
