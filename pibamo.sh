@@ -35,12 +35,12 @@
 # set -x
 
 cd ~
-SERVER=pibamo
 PROG="pibamo.sh"
 
 PICAM_DIR=~/picam
 SHM_DIR=/run/shm
 PID_FILE=${PICAM_DIR}/${PROG}.pid
+SERVER_FILE=${PICAM_DIR}/${PROG}.server
 
 check_privilege()
 {
@@ -89,8 +89,16 @@ make_directories()
     ~/picam-setup.sh directories
 }
 
-install_all()
+install()
 {
+    if [ ! -z "$1" ]; then
+        echo $1 > ${SERVER_FILE}
+    else
+        echo "pibamo" > ${SERVER_FILE}
+    fi
+
+    SERVER=$(cat ${SERVER_FILE})
+
     check_privilege
     install_dependencies
     configure_nginx
@@ -126,6 +134,8 @@ start()
         echo "${PROG} is already running."
         exit 1
     fi
+
+    SERVER=$(cat ${SERVER_FILE})
 
     # Make directories
     make_directories
@@ -170,7 +180,7 @@ main()
 {
     case $1 in
         install)
-            install_all
+            install $2
             ;;
 
         uninstall)
@@ -186,10 +196,10 @@ main()
             ;;
 
         *)
-            echo "Usage ${PROG} {install | uninstall | start | stop}"
+            echo "Usage ${PROG} {install [servername] | uninstall | start | stop}"
             ;;
 
     esac
 }
 
-main $1
+main $@
